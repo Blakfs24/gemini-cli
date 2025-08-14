@@ -3,7 +3,7 @@
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
-
+import { EndpointDisplay } from './components/EndpointDisplay.js';
 import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import {
   Box,
@@ -58,6 +58,7 @@ import {
   EditorType,
   FlashFallbackEvent,
   logFlashFallback,
+  baseURL,
   AuthType,
   type IdeContext,
   ideContext,
@@ -1102,6 +1103,9 @@ const App = ({ config, settings, startupWarnings = [], version }: AppProps) => {
                       showToolDescriptions={showToolDescriptions}
                     />
                   )}
+                </Box>
+                <Box>
+                  <EndpointDisplay baseURL={baseURL()} />
                 </Box>
                 <Box paddingTop={isNarrow ? 1 : 0}>
                   {showAutoAcceptIndicator !== ApprovalMode.DEFAULT &&

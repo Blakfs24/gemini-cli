@@ -91,6 +91,8 @@
     "yargs": "^17.7.2"
   },
   "dependencies": {
-    "node-fetch": "^3.3.2"
+    "jsonrepair": "^3.13.0",
+    "node-fetch": "^3.3.2",
+    "openai": "^5.12.2"
   }
 }

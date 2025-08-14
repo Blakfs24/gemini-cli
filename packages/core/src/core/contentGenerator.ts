@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { OpenAICompatibleContentGenerator } from './openAICompatibleContentGenerator.js';
 import {
   CountTokensResponse,
   GenerateContentResponse,
@@ -44,6 +45,7 @@ export interface ContentGenerator {
 export enum AuthType {
   LOGIN_WITH_GOOGLE = 'oauth-personal',
   USE_GEMINI = 'gemini-api-key',
+  USE_SILICONFLOW = 'api-key',
   USE_VERTEX_AI = 'vertex-ai',
   CLOUD_SHELL = 'cloud-shell',
 }
@@ -113,6 +115,15 @@ export async function createContentGenerator(
       'User-Agent': `GeminiCLI/${version} (${process.platform}; ${process.arch})`,
     },
   };
+  if (config.authType === AuthType.USE_SILICONFLOW) {
+    const apiKey = process.env.SILICONFLOW_API_KEY;
+    if (!apiKey) {
+      throw new Error(
+        'SILICONFLOW_API_KEY environment variable is not set. Please set it to use SiliconFlow.',
+      );
+    }
+    return new OpenAICompatibleContentGenerator(apiKey);
+  }
   if (
     config.authType === AuthType.LOGIN_WITH_GOOGLE ||
     config.authType === AuthType.CLOUD_SHELL

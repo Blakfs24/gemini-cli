@@ -9,7 +9,7 @@ import { Box, Text } from 'ink';
 import { Colors } from '../colors.js';
 import { RadioButtonSelect } from './shared/RadioButtonSelect.js';
 import { LoadedSettings, SettingScope } from '../../config/settings.js';
-import { AuthType } from '@google/gemini-cli-core';
+import { AuthType, isSiliconFlow } from '@google/gemini-cli-core';
 import { validateAuthMethod } from '../../config/auth.js';
 import { useKeypress } from '../hooks/useKeypress.js';
 
@@ -22,6 +22,9 @@ interface AuthDialogProps {
 function parseDefaultAuthType(
   defaultAuthType: string | undefined,
 ): AuthType | null {
+  if (isSiliconFlow()) {
+    return AuthType.USE_SILICONFLOW;
+  }
   if (
     defaultAuthType &&
     Object.values(AuthType).includes(defaultAuthType as AuthType)
@@ -60,25 +63,30 @@ export function AuthDialog({
     }
     return null;
   });
-  const items = [
-    {
-      label: 'Login with Google',
-      value: AuthType.LOGIN_WITH_GOOGLE,
-    },
-    ...(process.env.CLOUD_SHELL === 'true'
-      ? [
-          {
-            label: 'Use Cloud Shell user credentials',
-            value: AuthType.CLOUD_SHELL,
-          },
-        ]
-      : []),
-    {
-      label: 'Use Gemini API Key',
-      value: AuthType.USE_GEMINI,
-    },
-    { label: 'Vertex AI', value: AuthType.USE_VERTEX_AI },
+  const SiliconFlowItems = [
+    { label: 'SiliconFlow API Key', value: AuthType.USE_SILICONFLOW },
   ];
+  const items = isSiliconFlow()
+    ? SiliconFlowItems
+    : [
+      {
+        label: 'Login with Google',
+        value: AuthType.LOGIN_WITH_GOOGLE,
+      },
+      ...(process.env.CLOUD_SHELL === 'true'
+        ? [
+            {
+              label: 'Use Cloud Shell user credentials',
+              value: AuthType.CLOUD_SHELL,
+            },
+          ]
+        : []),
+      {
+        label: 'Use Gemini API Key',
+        value: AuthType.USE_GEMINI,
+      },
+      { label: 'Vertex AI', value: AuthType.USE_VERTEX_AI },
+    ];
 
   const initialAuthIndex = items.findIndex((item) => {
     if (settings.merged.selectedAuthType) {
